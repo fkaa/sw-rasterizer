@@ -1,0 +1,17 @@
+[package]
+name = "sw-rast"
+version = "0.1.0"
+authors = ["Felix Kaaman <trundmatu@gmail.com>"]
+
+[profile.dev]
+opt-level = 2
+
+[profile.release]
+panic = 'abort'
+
+[dependencies]
+cgmath = "*"
+gfx_app = { git = "https://github.com/gfx-rs/gfx" }
+gfx = { git = "https://github.com/gfx-rs/gfx" }
+obj = "*"
+hprof = "*"
