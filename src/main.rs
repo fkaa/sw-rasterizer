@@ -51,10 +51,12 @@ pub struct Vertex {
     uv: Vector2<f32>
 }
 
+#[inline]
 pub fn vertex_shader(input: Vertex, mat: Matrix4<f32>) -> (Uv, Vector4<f32>) {
     (Uv(input.uv), mat * input.pos.extend(1f32))
 }
 
+#[inline]
 pub fn fragment_shader(fragment: Vector2<f32>, input: Uv) -> Vector4<f32> {
     Vector4::new(input.0.x, input.0.y, 1f32, 1f32)
 }

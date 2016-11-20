@@ -166,7 +166,7 @@ impl<I, O> Pipeline<I, O>
                 if (p2.x as i32) < min.x { min.x = p2.x as i32; }
                 if (p2.y as i32) < min.y { min.y = p2.y as i32; }
                 if (p3.x as i32) < min.x { min.x = p3.x as i32; }
-                if (p3.y as i32) < min.y { min.y = p3.y as i32; }
+                if (p3.y as i32) <https://open.spotify.com/track/6X4mvrDbIckxVQlRm3HhtE min.y { min.y = p3.y as i32; }
 
                 if (p1.x as i32) > max.x { max.x = p1.x as i32; }
                 if (p1.y as i32) > max.y { max.y = p1.y as i32; }
@@ -191,10 +191,6 @@ impl<I, O> Pipeline<I, O>
                 max.x = (max.x + mask) & !mask;
                 max.y = (max.y + mask) & !mask;*/
 
-                let (mut w1, mut w2, mut w3) = (edge_function(p1, p2, point),
-                                                edge_function(p2, p3, point),
-                                                edge_function(p3, p1, point));
-
                 let (w1_step, w2_step, w3_step) = (edge_step(p1, p2, 1),
                                                    edge_step(p2, p3, 1),
                                                    edge_step(p3, p1, 1));
@@ -208,35 +204,34 @@ impl<I, O> Pipeline<I, O>
                             continue;
                         }
 
-                        if w1 >= 0 && w2 >= 0 && w3 >= 0 {
-                            //w1 /= area;
-                            //w2 /= area;
-                            //w3 /= area;
+                                        let (mut w1, mut w2, mut w3) = (edge_function(p1, p2, point),
+                                                edge_function(p2, p3, point),
+                                                edge_function(p3, p1, point));
 
-                            let depth_val = ((f32::min(Blend::blend(Depth(-a.z), w1 as f32, Depth(-b.z), w2 as f32, Depth(-c.z), w3 as f32).0,
+
+                        if w1 >= 0 && w2 >= 0 && w3 >= 0 {
+                            let w1 = w1 as f32 / area as f32;
+                            let w2 = w2 as f32 / area as f32;
+                            let w3 = w3 as f32 / area as f32;
+
+                            let depth_val = ((f32::min(Blend::blend(Depth(a.z), w1 as f32, Depth(b.z), w2 as f32, Depth(c.z), w3 as f32).0,
                                                        1000f32)
                                                      / 1000f32) * u32::max_value() as f32) as u32;
 
-                            if depth_val < depth[(x + width * y ) as usize] {
-                                depth[(x + width * y) as usize] = depth_val;
+                            let idx = (x + width * y) as usize;
+
+                            if depth_val < depth[idx] {
+                                depth[idx] = depth_val;
 
                                 let color = (frag)(Vector2::new(point.x as f32, point.y as f32), Blend::blend(A, w1 as f32, B, w2 as f32, C, w3 as f32));
 
-                                backbuffer[(x + width * y) as usize][0] = (color.x * 255f32) as u8;
-                                backbuffer[(x + width * y) as usize][1] = (color.y * 255f32) as u8;
-                                backbuffer[(x + width * y) as usize][2] = (color.z * 255f32) as u8;
-                                backbuffer[(x + width * y) as usize][3] = (color.w * 255f32) as u8;
+                                backbuffer[idx][0] = (color.x * 255f32) as u8;
+                                backbuffer[idx][1] = (color.y * 255f32) as u8;
+                                backbuffer[idx][2] = (color.z * 255f32) as u8;
+                                backbuffer[idx][3] = (color.w * 255f32) as u8;
                             }
                         }
-
-                        w1 += w1_step;
-                        w2 += w2_step;
-                        w3 += w3_step;
                     }
-
-                    w1 += w1_step;
-                    w2 += w2_step;
-                    w3 += w3_step;
                 }
             }
         }
